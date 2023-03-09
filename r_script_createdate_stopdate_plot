@@ -1,0 +1,37 @@
+# load the data
+data <- data.frame(
+  pseudonymisedid = c(14441, 14442, 14443, 14444, 14445, 14446),
+  medicationname = c("fentanyl", "codeine", "tramadol", "morphine", "oxycodone", "co-codamol"),
+  datecreated = c("2010-04-29 12:31:58", "2010-04-24 12:31:58", "2010-04-25 12:52:14", "2010-04-26 13:53:40", "2010-04-27 13:53:40", "2010-04-28 01:18:52"),
+  datestopped = c("2010-05-19T14:05:00Z", "2010-05-10T14:05:00Z", "2010-05-10T12:52:14Z", "2010-05-23T14:04:00Z", "2010-05-09T14:04:00Z", "2010-05-14T10:34:27Z"),
+  performedfromdtm = c("2010-05-09T14:05:00Z", "2010-04-29T14:05:00Z", "2010-05-01T12:52:14Z", "2010-05-13T14:04:00Z", "2010-05-03T14:04:00Z", "2010-04-30T10:34:27Z")
+)
+
+data$datecreated <- as.Date(data$datecreated)
+data$datestopped <- as.Date(data$datestopped)
+data$performedfromdtm <- as.Date(data$performedfromdtm)
+
+# convert date columns to POSIXct format
+data$datecreated <- as.POSIXct(data$datecreated, format="%Y-%m-%d %H:%M:%S")
+data$datestopped <- as.POSIXct(data$datestopped, format="%Y-%m-%dT%H:%M:%SZ")
+data$performedfromdtm <- as.POSIXct(data$performedfromdtm, format="%Y-%m-%dT%H:%M:%SZ")
+
+
+ggplot(data, aes(x = datecreated, y = pseudonymisedid)) +
+  geom_segment(aes(xend = datestopped, yend = pseudonymisedid), color = "blue", size = 1) +
+  geom_point(aes(x = datecreated, y = pseudonymisedid, color = "datecreated"), size = 3) +
+  geom_point(aes(x = datestopped, y = pseudonymisedid, color = "datestopped"), size = 3) +
+  geom_point(aes(x = performedfromdtm, y = pseudonymisedid, color = "performedfrom"), size = 3) +
+  labs(title = "", subtitle = "drug administration", x = "Date", y = "Pseudonymised ID") +
+  scale_x_datetime(date_breaks = "1 day", date_labels = "%m/%d/%Y") +
+  scale_color_manual(name = "", values = c("datecreated" = "black", "datestopped" = "pink", "performedfrom" = "darkred")) +
+  theme_minimal() +
+  theme(legend.position = "top", legend.box = "horizontal") +
+  guides(fill = "none") +
+  theme(axis.text.x = element_text(angle = 75, vjust = 1, hjust = 1)) +
+  theme(plot.title = element_text(hjust = 0.5, size = 20)) +
+  geom_text(aes(x = performedfromdtm, y = pseudonymisedid, label = performedfromdtm), vjust =2, size = 3) +
+  geom_text(aes(x = datecreated, y = pseudonymisedid, label = datecreated), vjust = -1, size = 3) +
+  geom_text(aes(x = datestopped, y = pseudonymisedid, label = datestopped), vjust = -1, size = 3)
+  
+  
